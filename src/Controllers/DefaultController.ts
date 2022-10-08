@@ -1,6 +1,6 @@
 import IHandler from '../Handlers/IHandler';
 import IController from './IController';
-import EndpointConstant from '../utils/constant/EndpointConstant';
+import EndpointConstant from '../Utils/Constant/EndpointConstant';
 
 export default class DefaultController implements IController {
     public static readonly instance :IController = new DefaultController();

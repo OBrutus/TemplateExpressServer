@@ -1,5 +1,5 @@
 import Server from './src/Server';
-import AppConstant from './src/utils/constant/AppConstants';
+import AppConstant from './src/Utils/Constant/AppConstants';
 
 let server = new Server(AppConstant.PORT);
 
