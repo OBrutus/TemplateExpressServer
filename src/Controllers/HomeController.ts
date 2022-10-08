@@ -1,16 +1,13 @@
 import IHandler from '../Handlers/IHandler';
-import IController from './IController';
+import IController, { AbstractController } from './IController';
 import EndpointConstant from '../Utils/Constant/EndpointConstant';
 import HomeHandler from '../Handlers/HomeHandler';
 import { Request, Response } from 'express';
 import Validator from '../Utils/Validator/Validator';
 
-export default class HomeController implements IController {
+export default class HomeController extends AbstractController implements IController {
     public static readonly instance: IController = new HomeController();
     public instance: IController = HomeController.instance;
-
-    // use only static instance variable and make class Singleton
-    private constructor() {}
 
     public handleEvent(req: Request, _res: Response): void {
         Validator.validateTruthy(req, 'The request found is null or undefined');
