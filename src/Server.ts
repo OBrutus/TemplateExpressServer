@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
+import compression from 'compression';
 import http from 'http';
 import { AbstractController } from './Controllers/IController';
+import { ServerCompressionOptions } from './Utils/Compression/ServerCompressionOptions';
 
 export default class Server {
     public app = express();
@@ -10,7 +12,7 @@ export default class Server {
         if (Server.isInitialised)
             throw new Error("Attempt to re-initialise the singleton class Server");
         Server.isInitialised = true;
-        
+        this.app.use(compression(ServerCompressionOptions.getDefaultOptions()));
         this.initEndpoint();
         this.startServer(_port);
     }
