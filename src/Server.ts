@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import compression from 'compression';
 import http from 'http';
-import { MetaController } from './Controllers/IController';
+import { MetaController } from './Controllers/MetaController';
 import { ServerCompressionOptions } from './Utils/Compression/ServerCompressionOptions';
 
 export default class Server {
@@ -27,12 +27,9 @@ export default class Server {
     }
 
     public initEndpoint() : void {
-        for(const bind of MetaController.ALL_BINDINGS) {
+        for(const bind of MetaController.ALL_GET_BINDINGS) {
             this.app.get(bind.endpoint, bind.handler);
         }
-        this.app.get("*", (req, res) => {
-            res.send("Not found" + req.toString());
-        });
     }
 
     public startServer(port: number) : http.Server {
