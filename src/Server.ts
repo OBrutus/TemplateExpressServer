@@ -1,36 +1,53 @@
-import express, { Request, Response } from 'express';
+import express, { Express } from 'express';
 import compression from 'compression';
 import http from 'http';
-import { AbstractController } from './Controllers/IController';
+import { MetaController } from './Controllers/IController';
 import { ServerCompressionOptions } from './Utils/Compression/ServerCompressionOptions';
 
 export default class Server {
-    public app = express();
-    private static isInitialised :boolean = false;
+    public readonly app: Express;
+    public static readonly SERVER_PORTS = new Set();
+    private httpServer: http.Server | undefined;
 
-    constructor(_port :number) {
-        if (Server.isInitialised)
-            throw new Error("Attempt to re-initialise the singleton class Server");
-        Server.isInitialised = true;
+    constructor(port: number) {
+        this.app = express();
+
+        // middle wares
         this.app.use(compression(ServerCompressionOptions.getDefaultOptions()));
+
+        // initialize endpoints
         this.initEndpoint();
-        this.startServer(_port);
-    }
-    
-    public initEndpoint() :void {
-        for(let controller of AbstractController.getAllControllers()) {
-            this.app.get(controller.getEndpoint(), (req :Request, res :Response) => {
-                controller.getHandler().handleRequest(req, res);
-            });
+
+        try {
+            this.httpServer = this.startServer(port);
+            Server.SERVER_PORTS.add(port);
+        } catch(error: unknown) {
+            console.error(`Unable to open up the service upon the port ${port}`);
         }
     }
 
-    public startServer(port :number) :http.Server {
+    public initEndpoint() : void {
+        for(const bind of MetaController.ALL_BINDINGS) {
+            this.app.get(bind.endpoint, bind.handler);
+        }
+        this.app.get("*", (req, res) => {
+            res.send("Not found" + req.toString());
+        });
+    }
+
+    public startServer(port: number) : http.Server {
         return this.app.listen(port, () => {
             console.log('====================================');
             console.log(`Started the server at port ${port}`);
             console.log('====================================');
         });
     }
-}
 
+    public stopServer() {
+        if (!this.httpServer) {
+            console.warn(`Tried to close a un-initiated server`);
+            return;
+        }
+        this.httpServer.close();
+    }
+}
