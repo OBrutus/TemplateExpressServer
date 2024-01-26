@@ -5,7 +5,7 @@ import EndpointConstant from '../Utils/Constant/EndpointConstant';
 export default class DummyController  {
     // It is ok to keep these methods as static, 
     // as express takes only function as input.
-    public static handleEvent(req: Request, res: Response) :void {
+    public static handleEvent(req: Request, res: Response) : void {
         try {
             Validator.validateTruthy(req, 'The request found is null or undefined');
             throw new Error('Method not implemented.');
