@@ -3,6 +3,8 @@ import compression from 'compression';
 import http from 'http';
 import { MetaController } from './Controllers/MetaController';
 import { ServerCompressionOptions } from './Utils/Compression/ServerCompressionOptions';
+import DatabaseDriver from './Drivers/DatabaseDriver';
+import { UserSeed } from './Drivers/Seed';
 
 export default class Server {
     public readonly app: Express;
@@ -15,8 +17,14 @@ export default class Server {
         // middle wares
         this.app.use(compression(ServerCompressionOptions.getDefaultOptions()));
 
+        // Create a connection to mongo db via this
+        DatabaseDriver.connectDB();
+
         // initialize endpoints
         this.initEndpoint();
+
+        // Seed the Db for test
+        UserSeed.addRandomUsers(4);
 
         try {
             this.httpServer = this.startServer(port);
@@ -45,6 +53,7 @@ export default class Server {
             console.warn(`Tried to close a un-initiated server`);
             return;
         }
+        DatabaseDriver.closeConnection();
         this.httpServer.close();
     }
 }
